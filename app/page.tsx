@@ -1,87 +1,12 @@
 "use client";
 import React, { useState } from "react";
 
-import {
-  Table,
-  TableBody,
-  TableCaption,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-  TableFooter,
-} from "@/components/ui/table";
+import { Card } from "@/components/ui/card";
 
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-
-import { Label } from "@/components/ui/label";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-
-import { useRouter } from "next/router";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Separator } from "@/components/ui/separator";
-import Link from "next/link";
-import Calculate from "./components/Calculate";
-
-const invoices = [
-  {
-    invoice: "INV001",
-    paymentStatus: "Paid",
-    totalAmount: "$250.00",
-    paymentMethod: "Credit Card",
-  },
-  {
-    invoice: "INV002",
-    paymentStatus: "Pending",
-    totalAmount: "$150.00",
-    paymentMethod: "PayPal",
-  },
-  {
-    invoice: "INV003",
-    paymentStatus: "Unpaid",
-    totalAmount: "$350.00",
-    paymentMethod: "Bank Transfer",
-  },
-  {
-    invoice: "INV004",
-    paymentStatus: "Paid",
-    totalAmount: "$450.00",
-    paymentMethod: "Credit Card",
-  },
-  {
-    invoice: "INV005",
-    paymentStatus: "Paid",
-    totalAmount: "$550.00",
-    paymentMethod: "PayPal",
-  },
-  {
-    invoice: "INV006",
-    paymentStatus: "Pending",
-    totalAmount: "$200.00",
-    paymentMethod: "Bank Transfer",
-  },
-  {
-    invoice: "INV007",
-    paymentStatus: "Unpaid",
-    totalAmount: "$300.00",
-    paymentMethod: "Credit Card",
-  },
-];
 
 const Salary = () => {
   interface Allowance {
@@ -91,9 +16,62 @@ const Salary = () => {
     id: number;
   }
 
+  const [basicSalary, setBasicSalary] = useState<number>(0);
   const [allowances, setAllowances] = useState<Allowance[]>([{ id: 1 }]);
   const [deductions, setDiductions] = useState<Diduction[]>([{ id: 1 }]);
   const [epfChecked, setEpfChecked] = useState(false);
+
+  //calculate net salary
+  const calculateNetSalary = () => {
+    let grossEarnings = 0;
+    let grossDeductions = 0;
+    let netSalary = 0;
+
+    allowances.forEach((allowance) => {
+      const amount = parseFloat(
+        (document.getElementById(`amount-${allowance.id}`) as HTMLInputElement)
+          .value
+      );
+      grossEarnings += amount;
+    });
+
+    deductions.forEach((deduction) => {
+      const amount = parseFloat(
+        (document.getElementById(`amount-${deduction.id}`) as HTMLInputElement)
+          .value
+      );
+      grossDeductions += amount;
+    });
+
+    netSalary = basicSalary + grossEarnings - grossDeductions;
+
+    return netSalary;
+  };
+
+  //event handlers
+  const handleBasicSalaryChange = (
+    event: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    setBasicSalary(parseFloat(event.target.value));
+  };
+
+  const handleAllowanceChange = (
+    event: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    const id = parseInt(event.target.id.split("-")[1]);
+    const allowancesCopy = [...allowances];
+    allowancesCopy[id - 1] = { id: id };
+    setAllowances(allowancesCopy);
+  };
+
+  const handleDeductionChange = (
+    event: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    const id = parseInt(event.target.id.split("-")[1]);
+    const deductionsCopy = [...deductions];
+    deductionsCopy[id - 1] = { id: id };
+    setDiductions(deductionsCopy);
+  };
 
   const addAllowance = (event: React.MouseEvent<HTMLButtonElement>) => {
     event.preventDefault();
@@ -254,7 +232,7 @@ const Salary = () => {
           <div className="flex flex-col space-y-2 mt-4">
             <div className="flex justify-between">
               <span className="text-[16px] ">Basic Salary</span>
-              <span className="text-[16px]">$1000.00</span>
+              <span className="text-[16px]">${basicSalary.toFixed(2)}</span>
             </div>
             <div className="flex justify-between">
               <span className="text-[16px] ">Gross Earnings</span>
