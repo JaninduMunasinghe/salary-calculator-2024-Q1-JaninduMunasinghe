@@ -1,113 +1,304 @@
-import Image from "next/image";
+"use client";
+import React, { useState } from "react";
 
-export default function Home() {
+import {
+  Table,
+  TableBody,
+  TableCaption,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+  TableFooter,
+} from "@/components/ui/table";
+
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+
+import { Label } from "@/components/ui/label";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+
+import { useRouter } from "next/router";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Separator } from "@/components/ui/separator";
+import Link from "next/link";
+import Calculate from "./components/Calculate";
+
+const invoices = [
+  {
+    invoice: "INV001",
+    paymentStatus: "Paid",
+    totalAmount: "$250.00",
+    paymentMethod: "Credit Card",
+  },
+  {
+    invoice: "INV002",
+    paymentStatus: "Pending",
+    totalAmount: "$150.00",
+    paymentMethod: "PayPal",
+  },
+  {
+    invoice: "INV003",
+    paymentStatus: "Unpaid",
+    totalAmount: "$350.00",
+    paymentMethod: "Bank Transfer",
+  },
+  {
+    invoice: "INV004",
+    paymentStatus: "Paid",
+    totalAmount: "$450.00",
+    paymentMethod: "Credit Card",
+  },
+  {
+    invoice: "INV005",
+    paymentStatus: "Paid",
+    totalAmount: "$550.00",
+    paymentMethod: "PayPal",
+  },
+  {
+    invoice: "INV006",
+    paymentStatus: "Pending",
+    totalAmount: "$200.00",
+    paymentMethod: "Bank Transfer",
+  },
+  {
+    invoice: "INV007",
+    paymentStatus: "Unpaid",
+    totalAmount: "$300.00",
+    paymentMethod: "Credit Card",
+  },
+];
+
+const Salary = () => {
+  interface Allowance {
+    id: number;
+  }
+  interface Diduction {
+    id: number;
+  }
+
+  const [allowances, setAllowances] = useState<Allowance[]>([{ id: 1 }]);
+  const [deductions, setDiductions] = useState<Diduction[]>([{ id: 1 }]);
+  const [epfChecked, setEpfChecked] = useState(false);
+
+  const addAllowance = (event: React.MouseEvent<HTMLButtonElement>) => {
+    event.preventDefault();
+    const newId = allowances.length + 1;
+    setAllowances([...allowances, { id: newId }]);
+  };
+
+  const addDeduction = (event: React.MouseEvent<HTMLButtonElement>) => {
+    event.preventDefault();
+    const newId = deductions.length + 1;
+    setDiductions([...deductions, { id: newId }]);
+  };
+
+  const handleCheckboxChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setEpfChecked(event.target.checked);
+  };
+
+  const removeAllowance = (id: number) => {
+    setAllowances(allowances.filter((allowance) => allowance.id !== id));
+  };
+
+  const removeDeduction = (id: number) => {
+    setDiductions(deductions.filter((deduction) => deduction.id !== id));
+  };
+
   return (
-    <main className="flex min-h-screen flex-col items-center justify-between p-24">
-      <div className="z-10 w-full max-w-5xl items-center justify-between font-mono text-sm lg:flex">
-        <p className="fixed left-0 top-0 flex w-full justify-center border-b border-gray-300 bg-gradient-to-b from-zinc-200 pb-6 pt-8 backdrop-blur-2xl dark:border-neutral-800 dark:bg-zinc-800/30 dark:from-inherit lg:static lg:w-auto  lg:rounded-xl lg:border lg:bg-gray-200 lg:p-4 lg:dark:bg-zinc-800/30">
-          Get started by editing&nbsp;
-          <code className="font-mono font-bold">app/page.tsx</code>
-        </p>
-        <div className="fixed bottom-0 left-0 flex h-48 w-full items-end justify-center bg-gradient-to-t from-white via-white dark:from-black dark:via-black lg:static lg:size-auto lg:bg-none">
-          <a
-            className="pointer-events-none flex place-items-center gap-2 p-8 lg:pointer-events-auto lg:p-0"
-            href="https://vercel.com?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            By{" "}
-            <Image
-              src="/vercel.svg"
-              alt="Vercel Logo"
-              className="dark:invert"
-              width={100}
-              height={24}
-              priority
-            />
-          </a>
+    <div className="flex flex-row space-x-4 ">
+      <Card className="w-[680px]">
+        <div className="m-5">
+          <h1 className="font-bold text-[20px]">Calculate Your Salary</h1>
+
+          <form>
+            <h2 className="font-bold mt-6 mb-2 text-[16px]">Basic Salary</h2>
+            <div className="grid w-full items-center gap-4">
+              <div className="flex flex-col space-y-1.5 mb-2">
+                <Input
+                  id="name"
+                  placeholder="Basic Salary"
+                  className="w-[356px] border-gray-300"
+                />
+              </div>
+            </div>
+
+            <h2 className="font-bold mt-6 mb-2 text-[16px]">Earnings</h2>
+            <p className="text-[12px] mb-2 text-slate-600">
+              Allowance, Fixed Allowance, Bonus and etc
+            </p>
+            {allowances.map((allowance, index) => (
+              <div key={allowance.id} className="flex space-x-3 mb-2">
+                <div className="flex flex-col space-y-1.5">
+                  <Input
+                    id={`allowance-${allowance.id}`}
+                    placeholder="Pay Deatils (Title)"
+                    className="w-[212px] border-gray-300"
+                  />
+                </div>
+                <div className="flex flex-col space-y-1.5">
+                  <Input
+                    id={`amount-${allowance.id}`}
+                    placeholder="Amount"
+                    className="w-[136px] border-gray-300"
+                  />
+                </div>
+                <button
+                  onClick={() => removeAllowance(allowance.id)}
+                  className="text-black flex items-center justify-center w-6 h-6 border rounded-full mt-2 bg-slate-200 hover:bg-gray-100">
+                  &#10006;
+                </button>
+
+                <div className="flex items-center space-x-2">
+                  <Checkbox id={`terms-${allowance.id}`} />
+                  <label
+                    htmlFor={`terms-${allowance.id}`}
+                    className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 ">
+                    EPF/ETF
+                  </label>
+                </div>
+              </div>
+            ))}
+            <div className="flex items-center space-x-2">
+              <span
+                onClick={addAllowance}
+                className="flex items-center space-x-1 cursor-pointer text-blue-500 mt-2">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  className="w-4 h-4"
+                  viewBox="0 0 20 20"
+                  fill="none">
+                  <path
+                    fillRule="evenodd"
+                    d="M10 0a1 1 0 011 1v8h8a1 1 0 110 2h-8v8a1 1 0 11-2 0v-8H1a1 1 0 110-2h8V1a1 1 0 011-1z"
+                    clipRule="evenodd"
+                    fill="currentColor"
+                  />
+                </svg>
+                <span>Add New Allowance</span>
+              </span>
+            </div>
+          </form>
+          <Separator orientation="horizontal" className="mt-6" />
+
+          <h2 className="font-bold mt-6 mb-2 text-[16px]">Dedctions</h2>
+          <p className="text-[12px] mb-2 text-slate-600">
+            Salary, Advances, Loan Dedctions and all
+          </p>
+          {deductions.map((deductions, index) => (
+            <div key={deductions.id} className="flex space-x-3 mb-2">
+              <div className="flex flex-col space-y-1.5">
+                <Input
+                  id={`allowance-${deductions.id}`}
+                  placeholder="Deductions Details (Title)"
+                  className="w-[212px] border-gray-300"
+                />
+              </div>
+              <div className="flex flex-col space-y-1.5">
+                <Input
+                  id={`amount-${deductions.id}`}
+                  placeholder="Amount"
+                  className="w-[136px] border-gray-300"
+                />
+              </div>
+              <button
+                onClick={() => removeDeduction(deductions.id)}
+                className="text-black flex items-center justify-center w-6 h-6 border rounded-full mt-2 bg-slate-200 hover:bg-gray-100">
+                &#10006;
+              </button>
+            </div>
+          ))}
+          <div className="flex items-center space-x-2">
+            <span
+              onClick={addDeduction}
+              className="flex items-center space-x-1 cursor-pointer text-blue-500 mt-2">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                className="w-4 h-4"
+                viewBox="0 0 20 20"
+                fill="none">
+                <path
+                  fillRule="evenodd"
+                  d="M10 0a1 1 0 011 1v8h8a1 1 0 110 2h-8v8a1 1 0 11-2 0v-8H1a1 1 0 110-2h8V1a1 1 0 011-1z"
+                  clipRule="evenodd"
+                  fill="currentColor"
+                />
+              </svg>
+              <span>Add New Deduction</span>
+            </span>
+          </div>
         </div>
-      </div>
+      </Card>
+      <Card className="w-[480px]">
+        <div className="m-5">
+          <h1 className="font-bold text-[20px]">Your Salary</h1>
+        </div>
 
-      <div className="relative z-[-1] flex place-items-center before:absolute before:h-[300px] before:w-full before:-translate-x-1/2 before:rounded-full before:bg-gradient-radial before:from-white before:to-transparent before:blur-2xl before:content-[''] after:absolute after:-z-20 after:h-[180px] after:w-full after:translate-x-1/3 after:bg-gradient-conic after:from-sky-200 after:via-blue-200 after:blur-2xl after:content-[''] before:dark:bg-gradient-to-br before:dark:from-transparent before:dark:to-blue-700 before:dark:opacity-10 after:dark:from-sky-900 after:dark:via-[#0141ff] after:dark:opacity-40 sm:before:w-[480px] sm:after:w-[240px] before:lg:h-[360px]">
-        <Image
-          className="relative dark:drop-shadow-[0_0_0.3rem_#ffffff70] dark:invert"
-          src="/next.svg"
-          alt="Next.js Logo"
-          width={180}
-          height={37}
-          priority
-        />
-      </div>
+        <div className="m-5">
+          <h1 className=" text-[14px] text-slate-400">Items</h1>
 
-      <div className="mb-32 grid text-center lg:mb-0 lg:w-full lg:max-w-5xl lg:grid-cols-4 lg:text-left">
-        <a
-          href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2 className="mb-3 text-2xl font-semibold">
-            Docs{" "}
-            <span className="inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none">
-              -&gt;
-            </span>
-          </h2>
-          <p className="m-0 max-w-[30ch] text-sm opacity-50">
-            Find in-depth information about Next.js features and API.
-          </p>
-        </a>
+          <div className="flex flex-col space-y-2 mt-4">
+            <div className="flex justify-between">
+              <span className="text-[16px] ">Basic Salary</span>
+              <span className="text-[16px]">$1000.00</span>
+            </div>
+            <div className="flex justify-between">
+              <span className="text-[16px] ">Gross Earnings</span>
+              <span className="text-[16px]">$100.00</span>
+            </div>
+            <div className="flex justify-between">
+              <span className="text-[16px] ">Gross Deductions</span>
+              <span className="text-[16px]">$50.00</span>
+            </div>
+            <div className="flex justify-between">
+              <span className="text-[16px] ">Employee EPT</span>
+              <span className="text-[16px]">$1050.00</span>
+            </div>
+            <div className="flex justify-between">
+              <span className="text-[16px] ">APIT</span>
+              <span className="text-[16px]">$50.00</span>
+            </div>
+            <div className="flex justify-between  rounded-md border px-4 py-3 ">
+              <span className="text-[16px] font-bold">Net Salary</span>
+              <span className="text-[16px] font-bold">$1000.00</span>
+            </div>
+          </div>
+          <h1 className=" text-sm  mt-4 text-slate-400">
+            Contribution from the Employer
+          </h1>
+          <div className="flex flex-col space-y-2 mt-4">
+            <div className="flex justify-between">
+              <span className="text-[16px]  ">Employeer EPF</span>
+              <span className="text-[16px]">$50.00</span>
+            </div>
+            <div className="flex justify-between">
+              <span className="text-[16px] ">Employeer ETF</span>
+              <span className="text-[16px]">$50.00</span>
+            </div>
 
-        <a
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2 className="mb-3 text-2xl font-semibold">
-            Learn{" "}
-            <span className="inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none">
-              -&gt;
-            </span>
-          </h2>
-          <p className="m-0 max-w-[30ch] text-sm opacity-50">
-            Learn about Next.js in an interactive course with&nbsp;quizzes!
-          </p>
-        </a>
-
-        <a
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2 className="mb-3 text-2xl font-semibold">
-            Templates{" "}
-            <span className="inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none">
-              -&gt;
-            </span>
-          </h2>
-          <p className="m-0 max-w-[30ch] text-sm opacity-50">
-            Explore starter templates for Next.js.
-          </p>
-        </a>
-
-        <a
-          href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2 className="mb-3 text-2xl font-semibold">
-            Deploy{" "}
-            <span className="inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none">
-              -&gt;
-            </span>
-          </h2>
-          <p className="m-0 max-w-[30ch] text-balance text-sm opacity-50">
-            Instantly deploy your Next.js site to a shareable URL with Vercel.
-          </p>
-        </a>
-      </div>
-    </main>
+            <div className="flex justify-between">
+              <span className="text-[16px] ">CTC Cost to Company</span>
+              <span className="text-[16px]">$50.00</span>
+            </div>
+          </div>
+        </div>
+      </Card>
+    </div>
   );
-}
+};
+
+export default Salary;
